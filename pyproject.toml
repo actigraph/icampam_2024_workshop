@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "day_counts"
+version = "0.1.0"
+description = "A sample packages for the ICAMPAM 2024 workshop on reproducible data analysis"
+authors = ["Ali Neishabouri <ali.neishabouri@theactigraph.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">3.9,<3.12"
+pandas = "^2.2.2"
+agcounts = "^0.2.3"
+pandavro = "^1.8.0"
+
+[tool.poetry.group.dev.dependencies]
+matplotlib = "^3.9.0"
+pytest = "^8.2.2"
+pytest-approvaltests = "^0.2.4"
+black = "^24.4.2"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

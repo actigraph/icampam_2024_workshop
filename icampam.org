@@ -2,7 +2,7 @@
 #+TITLE:     Reproducible data processing
 #+AUTHOR:    Ali Neishabouri
 #+EMAIL:     ali.neishabouri@theactigraph.com
-#+DATE:      
+#+DATE:      2024-06-18
 #+DESCRIPTION: 
 #+KEYWORDS: 
 #+LANGUAGE:  en
@@ -10,19 +10,62 @@
 #+LaTeX_CLASS: beamer
 #+LaTeX_CLASS_OPTIONS: [biggeri,aspectratio=169]
 #+OPTIONS:   H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+
 #+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
 #+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
 #+EXPORT_SELECT_TAGS: export
 #+EXPORT_EXCLUDE_TAGS: noexport
 #+HTML_LINK_UP:
 #+HTML_LINK_HOME:
+#+LATEX_HEADER: \usepackage{dirtree}
+#+LATEX_HEADER: \usebackgroundtemplate{}
+#+LATEX_HEADER: \definecolor{Azure}{RGB}{30, 44, 71}
+#+LATEX_HEADER: \definecolor{Rainy}{RGB}{101, 146, 169} 
+#+LATEX_HEADER: \setbeamercolor*{palette primary}{fg=Azure,bg=white}
+#+LATEX_HEADER: \setbeamercolor*{palette secondary}{fg=Rainy,bg=white}
+#+LATEX_HEADER: \setbeamercolor*{palette tertiary}{fg=black,bg=white}
+#+LATEX_HEADER: %\setbeamercolor*{palette quaternary}{fg=black,bg=white}
+#+LATEX_HEADER: \setbeamercolor{structure}{fg=Azure} % itemize, enumerate, etc
+#+LATEX_HEADER: \setbeamercolor{subsection in head/foot}{bg=white,fg=Rainy}
+#+LATEX_HEADER: \pgfdeclareimage[height=\paperheight]{mybackground}{./images/full_bg.png}
+#+LATEX_HEADER: \setbeamertemplate{background canvas}{%
+#+LATEX_HEADER:     \reflectbox{\includegraphics[width=\paperwidth,keepaspectratio]{%
+#+LATEX_HEADER:              ./images/background.png}}}
+#+BEAMER_HEADER: \setbeamertemplate{title page}{\begin{picture}(0,0)
+#+BEAMER_HEADER: \put(-27,-145){\pgfuseimage{mybackground}}
+#+BEAMER_HEADER: \put(0,-170.7){\begin{minipage}[b][45mm][t]{226mm}
+#+BEAMER_HEADER: \usebeamerfont{title}{\inserttitle\par}
+#+BEAMER_HEADER: \usebeamerfont{author}{\insertauthor\par}
+#+BEAMER_HEADER: \end{minipage}}
+#+BEAMER_HEADER: \end{picture}}
 
+#+BEAMER_HEADER: \defbeamertemplate{section in toc}{sections numbered roman}{%
+#+BEAMER_HEADER:    \makebox[2em]{\hfill\inserttocsectionnumber.}\space%
+#+BEAMER_HEADER:    \inserttocsection\par
+#+BEAMER_HEADER:}
+#+BEAMER_HEADER: \setbeamertemplate{section in toc}[sections numbered roman]
+
+
+
+#+LATEX_HEADER: \usepackage{tikz}
+#+LATEX_HEADER: %\usemintedstyle{monokai}
+#+LATEX_HEADER: \AtBeginEnvironment{minted}{\tiny}
+#+BEAMER_HEADER: \logo{\includegraphics[width=2cm]{./images/logo.png}}
+#+BAMER_HEADER: \setbeamertemplate{navigation symbols}{}
+
+#+BEAMER_HEADER: %\setbeameroption{show notes on second screen=right} % Both
+
+
+#+LATEX: \renewcommand{\bibfont}{\tiny}
 
 * What do we mean by reproducibility?
 ** At ActiGraph, we deal with clinical studies
+*** Life of a clinical study                                        :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
 #+begin_src mermaid :file ./images/life_of_studies.pdf
 gantt
-    title Life of a clinical study
     dateFormat YYYY-MM
     axisFormat %B
     section Before FPI
@@ -43,11 +86,9 @@ gantt
 #+RESULTS:
 [[file:./images/life_of_studies.pdf]]
 
-
 ** Data can be processed on different platforms
 #+ATTR_LATEX: :width 0.8\textwidth
 [[file:images/ds_location.png]]
-
 
 ** Code changes between executions
 #+begin_src mermaid :file ./images/gitlog.pdf
@@ -96,26 +137,30 @@ gitGraph
         branch test1
         checkout test1
         commit
-        branch test2
-        checkout test2
-        commit
         checkout main
         merge test1
-        merge test2
-       
-
 #+end_src
 
+#+ATTR_LATEX: :width 0.8\textwidth
 #+RESULTS:
+#+begin_org 
+#+ATTR_LATEX: :width 350
 [[file:./images/gitlog.pdf]]
+#+end_org
 
 
-
-** TODO Dependencies change between executions
-Get data from Dawid
+** Dependencies change between executions
+*** Updating Pandas [cite:@the_pandas_development_team_pandas-devpandas_2024] :B_example:
+:PROPERTIES:
+:BEAMER_env: example
+:END:
+**** v2.1.4
+[[file:./images/pandas_0.png]]
+**** v2.2.0
+[[file:./images/pandas_1.png]]
 
 ** More data comes in between executions, even out of order
-#+begin_src mermaid :file ./images/data_coming_in.pdf
+#+begin_src mermaid :file ./images/data_coming_in.pdf :pdf-fit
 block-beta
     columns 3
     %%doc>"Document"]:3
@@ -161,17 +206,420 @@ block-beta
 #+RESULTS:
 [[file:./images/data_coming_in.pdf]]
 
+** We couldn't get this to work
+*** Time in bed detected by scikit-digital-health [cite:@adamowicz_scikit_2022]
+[[file:images/skdh_baseline.png]]
+*** Same thing, with one sample removed at the beginning
+[[file:images/skdh_1removed.png]]
 
-** TODO We couldn't get this to work
-Get data from Dawid
-
-** Sneaky things happen
+** Sneaky things happen [cite:@van_hees_estimating_2018]
 #+ATTR_LATEX: :width \textwidth
 [[file:images/vh2018.png]]
 
-[cite/t/cf:@van_hees_estimating_2018]
+*** Appending data at the beginning will shift all windows     :B_alertblock:
+:PROPERTIES:
+:BEAMER_env: alertblock
+:END:
 
-* Second frame?
-** Bibliography
+ 
+* During the design
+** So what should we do?
+- [ ] The design phase
+** Beware of how your windows are defined
+*** `Grouper` in Pandas [cite:@the_pandas_development_team_pandas-devpandas_2024]                                  :B_example:
+:PROPERTIES:
+:BEAMER_env: example
+:END:
+[[file:images/grouper.png]]
+** Beware of filters and boundary effects
+*** Calculating ActiGraph counts [cite:@neishabouri_quantification_2022] :B_example:
+:PROPERTIES:
+:BEAMER_env: example
+:END:
+
+#+ATTR_LATEX: :width 0.5\textwidth
+[[file:./images/flowchart.pdf]]
+- The various filters all have boundary effects
+- In CentrePoint, a 25 second margin is used to get rid of those.
+** Some operations are intrinsically not deterministic
+*** Auto-calibration is necessary for ENMO [cite:@migueles_ggir_2019;@van_hees_autocalibration_2014] :B_example:
+:PROPERTIES:
+:BEAMER_env: example
+:END:
+- This requires finding periods of no movement.
+- When data can come in out-of-order, this becomes non-deterministic.
+
+
+* Implementation
+** So what should we do?
+- [X] The design phase
+- [ ] Implementation
+
+*** Let's code something up                                       :B_example:
+:PROPERTIES:
+:BEAMER_env: example
+:END:
+** We all forget what we did
+*** We need git                                                     :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.8\textwidth
+[[file:images/bad-version-control.png]]
+**** Largely a solved problem in software engineering
+** Make sure you master git
+*** Tips                                                           :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_col: 0.5
+:END:
+**** Commit early and often
+**** Use and abuse branches
+**** Take care of commit messages
+**** Tags are your friends
+
+*** Pro-git
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_col: 0.5
+:END:
+
+#+ATTR_LATEX: :width 0.3\paperwidth
+[[https://git-scm.com/images/progit2.png]]
+
+** Reduce manual steps as much as you can
+[[file:./images/snakemake.png]]
+*** Note                                                             :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+Live code
+
+** Regressions
+*** Regression tests                                           :B_alertblock:
+:PROPERTIES:
+:BEAMER_env: alertblock
+:END:
+It is crucial to make sure you are not breaking something as you code. There are so many moving
+pieces in a modern software stack!
+*** Unit tests                                                 :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:BEAMER_col: 0.5
+:END:
+Unit testing, a.k.a. component or module testing, is a form of
+software testing by which isolated source code is tested to validate
+expected behavior
+*** Approval tests                                             :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:BEAMER_col: 0.5
+:END:
+You capture the output of a software, system, or program and then
+compare it with the previously approved version to quickly verify that
+the current output matches the expected output.
+** Unit tests
+*** Function to test                                               :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_col: 0.3
+:BEAMER_opt: [t]
+:END:
+**** Function to test
+#+begin_src python :eval no
+def foo(x):
+  if x>0:
+    return x+1
+#+end_src
+
+*** Tests                                                          :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_col: 0.7
+:BEAMER_opt: [t]
+:END:
+**** The test
+#+BEGIN_SRC python :eval no
+import unittest
+
+class TestAddFunction(unittest.TestCase):
+    def test_add_positive_numbers(self):
+        self.assertEqual(add(1, 2), 3)
+
+    def test_add_negative_numbers(self):
+        self.assertEqual(add(-1, -2), -3)
+
+    def test_add_positive_and_negative_numbers(self):
+        self.assertEqual(add(1, -1), 0)
+
+    def test_add_zeros(self):
+        self.assertEqual(add(0, 0), 0)
+
+if __name__ == '__main__':
+    unittest.main()
+#+END_SRC
+
+** Approval tests
+*** Function                                                       :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+**** The real function
+#+BEGIN_SRC python
+  def _transform(
+	  self,
+	  inputs: Dict[str, Dataset],
+      ) -> Dataset:
+      features = inputs["magnitude"].data
+      labels = inputs["activity"].data
+
+      peaks = features.groupby(pd.Grouper(
+	      freq=f"{UWF.WIN_SIZE}s",
+	      origin="start_day",
+	      closed="left", 
+	  )).apply(
+	      lambda x: self._get_steps(x, labels)
+      )
+
+      freqs_from_peaks = sampling_rate * 2 / peaks
+      steps = pd.DataFrame(
+	  data=freqs_from_peaks * UWF.WIN_SIZE, columns=["steps"]
+      ).replace(np.inf, 0)
+
+      return steps
+#+END_SRC
+
+*** Approval test                                                  :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_col: 0.5
+:BEAMER_opt: [t]
+:END:
+
+**** The test
+
+#+BEGIN_SRC 
+,subject,date,bout_id,bout_start,bout_end,duration,walk_steps,run_steps,walk_distance,run_distance,cadence_mean,cadence_50,cadence_95,speed_mean,speed_50,speed_95,Subject,StudyId,SiteIdentifier,DeviceId
+0,10821,2020-10-13,0,2020-10-13 08:58:16.334-0500,2020-10-13 08:58:25.201-0500,8.867,32,0,25,0,128.682,116.000,147.000,1.730,1.528,2.306,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+1,10821,2020-10-13,1,2020-10-13 09:05:28.942-0500,2020-10-13 09:05:34.305-0500,5.362,18,0,11,0,104.914,105.000,106.000,1.062,1.139,1.194,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+2,10821,2020-10-13,2,2020-10-13 09:37:12.994-0500,2020-10-13 09:37:39.172-0500,26.178,61,0,41,0,109.372,110.000,114.000,1.241,1.278,1.361,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+3,10821,2020-10-13,3,2020-10-13 09:37:58.003-0500,2020-10-13 09:38:17.678-0500,19.676,34,0,23,0,108.317,108.000,116.000,1.215,1.194,1.417,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+4,10821,2020-10-13,4,2020-10-13 09:40:51.283-0500,2020-10-13 09:41:46.805-0500,55.522,108,0,73,0,106.581,107.000,112.000,1.189,1.194,1.333,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+5,10821,2020-10-13,5,2020-10-13 09:48:55.275-0500,2020-10-13 09:50:46.784-0500,111.509,189,7,130,6,110.408,108.000,117.000,1.279,1.222,1.444,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+6,10821,2020-10-13,6,2020-10-13 09:54:15.700-0500,2020-10-13 09:54:24.017-0500,8.318,14,0,8,0,105.015,104.000,113.150,1.091,1.111,1.282,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+7,10821,2020-10-13,7,2020-10-13 09:55:44.197-0500,2020-10-13 09:55:56.611-0500,12.413,30,0,21,0,103.905,103.000,108.000,1.098,1.111,1.167,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+8,10821,2020-10-13,8,2020-10-13 09:56:40.099-0500,2020-10-13 09:57:34.524-0500,54.424,90,0,58,0,103.388,103.000,112.000,1.117,1.111,1.306,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+9,10821,2020-10-13,9,2020-10-13 10:48:53.281-0500,2020-10-13 10:49:05.019-0500,11.738,36,0,25,0,109.724,110.000,113.000,1.225,1.250,1.333,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+10,10821,2020-10-13,10,2020-10-13 11:11:40.900-0500,2020-10-13 11:11:48.415-0500,7.516,27,0,18,0,114.156,114.000,116.000,1.301,1.361,1.417,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+11,10821,2020-10-13,11,2020-10-13 11:44:27.862-0500,2020-10-13 11:44:37.109-0500,9.247,17,0,13,0,116.032,117.000,120.000,1.410,1.417,1.500,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+12,10821,2020-10-13,12,2020-10-13 12:47:13.194-0500,2020-10-13 12:47:39.203-0500,26.009,59,0,41,0,108.361,109.000,111.000,1.217,1.250,1.306,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+13,10821,2020-10-13,13,2020-10-13 12:47:56.683-0500,2020-10-13 12:48:17.667-0500,20.984,36,0,24,0,108.104,108.000,116.000,1.207,1.194,1.417,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+14,10821,2020-10-13,14,2020-10-13 12:50:51.440-0500,2020-10-13 12:51:47.047-0500,55.607,108,0,74,0,106.709,107.000,112.000,1.192,1.194,1.333,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+15,10821,2020-10-13,15,2020-10-13 12:58:55.813-0500,2020-10-13 13:00:46.731-0500,110.918,187,7,129,7,110.459,108.000,117.000,1.280,1.222,1.444,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+16,10821,2020-10-13,16,2020-10-13 13:04:13.704-0500,2020-10-13 13:04:24.049-0500,10.344,18,0,11,0,104.691,104.000,113.000,1.096,1.111,1.278,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+17,10821,2020-10-13,17,2020-10-13 13:05:46.804-0500,2020-10-13 13:05:56.557-0500,9.753,30,0,21,0,104.681,105.000,107.000,1.098,1.139,1.194,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+18,10821,2020-10-13,18,2020-10-13 13:06:42.411-0500,2020-10-13 13:07:34.555-0500,52.144,102,0,67,0,104.148,104.000,112.000,1.133,1.111,1.306,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+19,10821,2020-10-13,19,2020-10-13 13:58:54.790-0500,2020-10-13 13:59:04.923-0500,10.133,34,0,23,0,109.938,110.000,113.000,1.225,1.278,1.333,1SchmoeDiddy-Wrist-Left,235,1,XYZ
+#+END_SRC
+
+
+* Third-party dependencies
+** So what should we do?
+- [X] The design phase
+- [X] Implementation
+- [ ] Third-party dependencies
+
+** Tracking dependencies
+:PROPERTIES:
+:BEAMER_opt: allowframebreaks,label=
+:END:
+*** There are many such tools for Python
+*** PIP                                                           :B_example:
+:PROPERTIES:
+:BEAMER_env: example
+:END:
+=python -m pip freeze [options]=
+
+*** Poetry                                                        :B_example:
+:PROPERTIES:
+:BEAMER_env: example
+:END:
+
+=poetry lock=
+
+*** Conda environment [cite:@anaconda_anaconda_2016]              :B_example:
+:PROPERTIES:
+:BEAMER_env: example
+:END:
+
+=conda list --export=
+** Managing the full pipeline using Snakemake [cite:@molder_sustainable_2021]
+#+begin_src mermaid :file ./images/snakemake_conda.pdf :pdf-fit
+  flowchart TD
+    A[Snakefile] -->C[Snakemake]
+    B[environment.yml] --> C
+    A-->E
+
+    C -->|Once| D[Generate conda environment for rule A]
+    D -->|As many times as needed| E(Rule A)
+#+end_src
+
+#+ATTR_LATEX: :width 0.5\paperwidth
+#+RESULTS:
+[[file:./images/snakemake_conda.pdf]]
+
+
+* Platform
+** So what should we do?
+- [X] The design phase
+- [X] Implementation
+- [X] Third-party dependencies
+- [ ] The environment
+
+** Freezing everything using containers
+#+BEGIN_SRC mermaid :file ./images/containers.pdf :pdf-fit
+  block-beta
+    columns 2
+    block 
+        columns 1
+        appa["App A"]
+        depa["Dependencies A"]
+    end
+    block 
+        columns 1
+        appb["App B"]
+        depb["Dependencies B"]
+    end
+    docker["Docker"]:2
+    host["Host operating system"]:2
+#+END_SRC
+
+#+ATTR_LATEX: :width 0.6\paperwidth
+#+RESULTS:
+[[file:./images/containers.pdf]]
+
+** CentrePoint Designer
+*** Input                                                          :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_col: 0.5
+:END:
+#+begin_src latex
+  \dirtree{%
+    .1 /.
+    .2 input.
+    .3 epoch.
+    .4 DBO\_WEAR.csv.gz.
+    .4 DBO\_COUNTS.csv.gz.
+    .3 parameters.
+    .4 Parameters.json.gz. 
+    .3 raw.
+    .3 studyadmin.
+    .4 StudyAdmin\_StudySubject.csv.gz.
+  }
+#+end_src
+
+#+RESULTS:
+#+begin_export latex
+\dirtree{%
+  .1 /.
+  .2 input.
+  .3 epoch.
+  .4 DBO\_WEAR.csv.gz.
+  .4 DBO\_COUNTS.csv.gz.
+  .3 parameters.
+  .4 Parameters.json.gz. 
+  .3 raw.
+  .3 studyadmin.
+  .4 StudyAdmin\_StudySubject.csv.gz.
+}
+#+end_export
+
+*** Raw                                                            :B_column:
+:PROPERTIES:
+:BEAMER_env: column
+:BEAMER_col: 0.5
+:END:
+#+begin_src latex
+  \dirtree{%
+    .1 raw.
+    .2 Accelerometer.
+    .3 ADXL.
+    .4 <DeviceID>.
+    .2 Temperature.
+    .3 TMP.
+    .4 <DeviceID>.
+    .2 PpgGreen.
+    .3 AFE.
+    .4 <DeviceID>.
+   }
+#+end_src
+
+#+RESULTS:
+#+begin_export latex
+\dirtree{%
+  .1 raw.
+  .2 Accelerometer.
+  .3 ADXL.
+  .4 <DeviceID>.
+  .2 Temperature.
+  .3 TMP.
+  .4 <DeviceID>.
+  .2 PpgGreen.
+  .3 AFE.
+  .4 <DeviceID>.
+ }
+#+end_export
+
+** Raw data                          
+#+begin_src latex
+  \dirtree{%
+    .1 <DeviceID>.
+    .2 2024.
+    .3 01.
+    .4 30.
+    .5 Accelerometer\_ADXL\_208403f6-9161-4e0b-863f-693861a64284.avro. 
+    .4 31.
+    .5 Accelerometer\_ADXL\_44345eab-bb7c-4a16-8bdf-cdc29114f389.avro. 
+    .3 02.
+    .4 01.
+    .5 Accelerometer\_ADXL\_4265a3b3-16ab-4bcd-841c-04c44dea3296.avro. 
+    .4 02.
+    .5 Accelerometer\_ADXL\_85f03887-e91e-4b61-831f-7f5297e76b20.avro. 
+  }
+#+end_src
+
+#+RESULTS:
+#+begin_export latex
+\dirtree{%
+  .1 <DeviceID>.
+  .2 2024.
+  .3 01.
+  .4 30.
+  .5 Accelerometer\_ADXL\_208403f6-9161-4e0b-863f-693861a64284.avro. 
+  .4 31.
+  .5 Accelerometer\_ADXL\_44345eab-bb7c-4a16-8bdf-cdc29114f389.avro. 
+  .3 02.
+  .4 01.
+  .5 Accelerometer\_ADXL\_4265a3b3-16ab-4bcd-841c-04c44dea3296.avro. 
+  .4 02.
+  .5 Accelerometer\_ADXL\_85f03887-e91e-4b61-831f-7f5297e76b20.avro. 
+}
+#+end_export
+
+
+
+* Appendices                                                     :B_appendix:
+:PROPERTIES:
+:BEAMER_env: appendix
+:END:
+** Source code
+https://github.com/actigraph/icampam_2024_workshop
+** Bibliography                                               
+:PROPERTIES:
+:BEAMER_opt: allowframebreaks,label=
+:END:
 #+print_bibliography:
 

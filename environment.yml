@@ -1,0 +1,13 @@
+name: daily_counts
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pandas
+  - pytables
+  - python=3.10
+  - tabulate=0.8.10
+  - pandavro=1.7.2
+  - pip
+  - pip:
+    - git+ssh://git@github.com/actigraph/icampam_2024_workshop@afc03c9529521c6cbc5994ed9646c2c2914c4040

@@ -1,0 +1,6 @@
+*.DS_Store
+images/*.pdf
+*.bbl
+*.tex
+*_archive
+_minted-icampam

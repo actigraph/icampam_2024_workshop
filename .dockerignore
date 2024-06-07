@@ -1,0 +1,9 @@
+input
+counts*
+images
+*.org
+*.tex
+*.pdf
+icampam*
+Snakefile
+daily
