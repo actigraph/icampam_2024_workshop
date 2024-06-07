@@ -1,0 +1,177 @@
+
+#+TITLE:     Reproducible data processing
+#+AUTHOR:    Ali Neishabouri
+#+EMAIL:     ali.neishabouri@theactigraph.com
+#+DATE:      
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [biggeri,aspectratio=169]
+#+OPTIONS:   H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+HTML_LINK_UP:
+#+HTML_LINK_HOME:
+
+
+* What do we mean by reproducibility?
+** At ActiGraph, we deal with clinical studies
+#+begin_src mermaid :file ./images/life_of_studies.pdf
+gantt
+    title Life of a clinical study
+    dateFormat YYYY-MM
+    axisFormat %B
+    section Before FPI
+    User-acceptance :a1, 2023-12, 1M
+    Study Runs       :a2, after a1, 11M
+    Analysis         :a3, after a2, 1M
+    section Milestones
+    Test data export :milestone, b1, 2024-01, 0m
+    First patient inn : crit, 2024-01, 0m
+    First data export :milestone, b1, 2024-03, 0m
+    Second data export : milestone, 2024-04, 0m
+    Interim analysis :milestone, b1, 2024-06, 0m
+    Final export : milestone, 2024-08, 0m
+    Database lock : crit, 2024-12, 0m
+
+#+end_src
+
+#+RESULTS:
+[[file:./images/life_of_studies.pdf]]
+
+
+** Data can be processed on different platforms
+#+ATTR_LATEX: :width 0.8\textwidth
+[[file:images/ds_location.png]]
+
+
+** Code changes between executions
+#+begin_src mermaid :file ./images/gitlog.pdf
+gitGraph
+        commit
+        branch hotfix
+        checkout hotfix
+        commit
+        branch develop
+        checkout develop
+        commit id:"ash" tag:"abc"
+        branch featureB
+        checkout featureB
+        commit type:HIGHLIGHT
+        checkout main
+        checkout hotfix
+        commit type:NORMAL
+        checkout develop
+        commit type:REVERSE
+        checkout featureB
+        commit
+        checkout main
+        merge hotfix
+        checkout featureB
+        commit
+        checkout develop
+        branch featureA
+        commit
+        checkout develop
+        merge hotfix
+        checkout featureA
+        commit
+        checkout featureB
+        commit
+        checkout develop
+        merge featureA
+        branch release
+        checkout release
+        commit
+        checkout main
+        commit
+        checkout release
+        merge main
+        checkout develop
+        merge release
+        branch test1
+        checkout test1
+        commit
+        branch test2
+        checkout test2
+        commit
+        checkout main
+        merge test1
+        merge test2
+       
+
+#+end_src
+
+#+RESULTS:
+[[file:./images/gitlog.pdf]]
+
+
+
+** TODO Dependencies change between executions
+Get data from Dawid
+
+** More data comes in between executions, even out of order
+#+begin_src mermaid :file ./images/data_coming_in.pdf
+block-beta
+    columns 3
+    %%doc>"Document"]:3
+    %%space down1<[" "]>(down) space
+
+  block:d:3
+          l["No data"]
+          m("Data available")
+          r["No data"]
+  end
+
+  space down1<[" "]>(down) space
+
+  block:e:3
+          ll["No data"]
+          mm("Data available")
+          rr("Data available")
+  end
+
+  space down2<[" "]>(down) space
+
+  block:f:3
+          lll("Data available")
+          mmm("Data available")
+          rrr("Data available")
+  end
+    %% space down2<[" "]>(down) space
+    %% db[("DB")]:3
+    %% space:3
+    %% D space C
+    %% db --> D
+    %% C --> db
+    %% D --> C
+    style m fill:#d6d,stroke:#333,stroke-width:4px
+    style mm fill:#d6d,stroke:#333,stroke-width:4px
+    style rr fill:#d6d,stroke:#333,stroke-width:4px
+    style lll fill:#d6d,stroke:#333,stroke-width:4px
+    style mmm fill:#d6d,stroke:#333,stroke-width:4px
+    style rrr fill:#d6d,stroke:#333,stroke-width:4px
+    
+#+end_src
+
+#+RESULTS:
+[[file:./images/data_coming_in.pdf]]
+
+
+** TODO We couldn't get this to work
+Get data from Dawid
+
+** Sneaky things happen
+#+ATTR_LATEX: :width \textwidth
+[[file:images/vh2018.png]]
+
+[cite/t/cf:@van_hees_estimating_2018]
+
+* Second frame?
+** Bibliography
+#+print_bibliography:
+
