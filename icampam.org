@@ -51,7 +51,14 @@
 #+LATEX_HEADER: %\usemintedstyle{monokai}
 #+LATEX_HEADER: \AtBeginEnvironment{minted}{\tiny}
 #+BEAMER_HEADER: \logo{\includegraphics[width=2cm]{./images/logo.png}}
-#+BAMER_HEADER: \setbeamertemplate{navigation symbols}{}
+
+#+BEAMER_HEADER: \addtobeamertemplate{navigation symbols}{}{%
+#+BEAMER_HEADER:     \usebeamerfont{footline}%
+#+BEAMER_HEADER:     \usebeamercolor[fg]{footline}%
+#+BEAMER_HEADER:     \hspace{1em}%
+#+BEAMER_HEADER:     \insertframenumber/\inserttotalframenumber
+#+BEAMER_HEADER: }
+
 
 #+BEAMER_HEADER: %\setbeameroption{show notes on second screen=right} % Both
 
