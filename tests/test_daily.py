@@ -1,3 +1,5 @@
+from approvaltests.approvals import verify
+
 from day_counts.core import (
     acc_from_avro,
     apply_cutpoint,
@@ -17,7 +19,7 @@ def test_counts_60():
     magnitude_counts = magnitude(counts_60)
     intensity = apply_cutpoint(magnitude_counts, 3000)
     days = daily(intensity)
-    assert days.iloc[0] == 23
+    verify(days)
 
 
 def test_counts_after_sum():
